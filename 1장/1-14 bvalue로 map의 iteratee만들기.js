@@ -49,7 +49,7 @@ console.log(log_length(
         // function (user) { return user.name; }
         bvalue('name')
     )
-));
+))
 
 // Memo
 // map이 사용할 iteratee 함수를 bvalue가 리턴한 함수로 대체했다. 익명 함수 선언이 사라져 코드가 더욱 짧아졌다.
