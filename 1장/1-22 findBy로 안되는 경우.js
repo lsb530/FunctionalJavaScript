@@ -14,7 +14,7 @@ const users2 = [
     new User(5, "JE", 27),
     new User(6, "JM", 32),
     new User(7, "HI", 24),
-]
+];
 function findBy(key, list, val) {
     for(let i=0,len=list.length;i<len;i++) {
         if(list[i][key] === val) return list[i];

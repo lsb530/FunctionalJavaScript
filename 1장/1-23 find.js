@@ -21,4 +21,6 @@ function find(list, predicate) {
     }
 }
 console.log(find(users2, function(u) { return u.getAge() == 25; }).getName()); // HA
-console.log(find(users, function(u) { return u.name.indexOf('P') != -1; }));
+console.log(find(users, function(u) { return u.name.indexOf('P') !== -1; }));
+console.log(find(users, function(u) { return u.age === 32 && u.name === 'JM';}));
+console.log(find(users2, function (u) { return u.getAge() < 30; }).getName());
