@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        #data img {
+            width: 130px;
+            height: 190px;
+        }
+        #buttonsDiv {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+        button {
+            margin-left: 10px;
+            margin-right: 10px;
+            zoom: 1.4;
+            font-weight: bold;
+        }
+        .answer {
+            border: 1px solid blue;
+        }
+        #leftCardDiv {
+            margin: 0 auto;
+            text-align: center;
+        }
+        #leftTimeDiv {
+            text-align: center;
+            color: deeppink;
+            font-size: 1.2rem;
+            margin: 0 auto 10px;
+        }
+    </style>
+</head>
+<script type="text/javascript">
+    /*
+        option:0 => 최초렌더링, 1 => 뒤집기, 2 => 감추기, 3 => 안보이게 섞기, 4=> 보이게 섞기, None => 보이게
+    */
+    function displayCard(list, target, option) {
+        if (option === 0) { // 최초렌더링
+            target.innerHTML = '';
+            for(let i=0, len=list.length; i<len; i++) { // No option
+                target.innerHTML += `<img id='${list[i]}' src='./imgs/${list[i]}.png'>`;
+            }
+            time = 240;
+        } else if (option === 1) { // 뒤집기
+            const imgs = document.querySelectorAll('img');
+            // 리액트를 모방
+            for(let i=0, len=imgs.length; i<len; i++) {
+                const clName = imgs[i].className;
+                if (clName !== 'answer') {
+                    imgs[i].src = `./imgs/reverse.png`;
+                }
+            }
+        } else if(option === 2) { // 안보이게
+            target.style.visibility = 'hidden';
+        } else if(option === 3) { // 안보이게 섞기
+            target.innerHTML = '';
+            target.style.visibility = 'visible';
+            for(let i=0, len=list.length; i<len; i++) {
+                target.innerHTML += `<img id='${list[i]}' src='./imgs/reverse.png'>`;
+            }
+            time = 240;
+        } else if(option === 4) { // 보이게 섞기
+            target.innerHTML = '';
+            target.style.visibility = 'visible';
+            for(let i=0, len=list.length; i<len; i++) {
+                target.innerHTML += `<img id='${list[i]}' src='./imgs/${list[i]}.png'>`;
+            }
+            time = 240;
+        }
+        else { // 보이게
+            target.style.visibility = 'visible';
+            const imgs = document.querySelectorAll('img');
+            for(let i=0, len=imgs.length; i<len; i++) {
+                const clName = imgs[i].className;
+                if (clName !== 'answer') {
+                    imgs[i].src = `./imgs/${imgs[i].id}.png`;
+                }
+            }
+        }
+        addOnclickEvents();
+        leftCount();
+    }
+
+    function addOnclickEvents() {
+        const imges = document.querySelectorAll('img');
+        for(let i=0, len=imges.length; i<len; i++) {
+            imges[i].addEventListener("click", playGame);
+        }
+        // console.log('testOne',list); // 여기까진 값 넘어옴
+    }
+
+    function playGame(e, list) {
+        if(playing) {
+            // console.log('testTwo',list); // undefined가 넘어왔지만 해결함 크크크
+            arr.push(e.target.id);
+            const selectOne = document.getElementById(arr[0]);
+            selectOne.src = `./imgs/${selectOne.id}.png`;
+            if (arr.length === 2) { // 선택한 두 장의 카드로 판단
+                const result = answerCheck(arr[0], arr[1]); // 1이면 카드 뒤집기. 0이면 원래대로
+                console.log('결과', result);
+                const selectTwo = document.getElementById(arr[1]);
+                if(result === 1) { // 정답
+                    console.log('정답');
+                    selectTwo.src = `./imgs/${selectTwo.id}.png`;
+                    // 정답 클래스를 추가
+                    selectOne.className = 'answer';
+                    selectTwo.className = 'answer';
+                    time+=10;
+                } else {
+                    console.log('오답');
+                    selectTwo.src = `./imgs/${selectTwo.id}.png`;
+                    setTimeout(() => {
+                        selectOne.src = `./imgs/reverse.png`;
+                        selectTwo.src = `./imgs/reverse.png`;
+                    }, 1000);
+                    time-=2;
+                }
+                arr = [];
+            }
+            leftCount();
+        } else {
+            alert('카드를 뒤집은 상태에서만 게임을 진행할 수 있습니다. (뒤집기) 버튼을 눌러주세요^^');
+        }
+    }
+    function answerCheck(one, two) { // 1이면 답, 0이면 오답으로 처리하자!!
+        console.log('답 체크중....');
+        console.log('계산값',Math.abs((two-one)/13));
+        return (Math.abs((two-one)/13)) === 2 ? 1 : 0;
+    }
+    function leftCount() {
+        const leftCards = document.getElementById("leftCardDiv");
+        const imgs = document.querySelectorAll('img');
+        let count = 0;
+        for(let i=0, len=imgs.length; i<len; i++) {
+            const clName = imgs[i].className;
+            if (clName !== 'answer') {
+                count ++;
+            }
+        }
+        leftCards.innerHTML = `<h3>남은 카드는 ${count} 개입니다</h3>`;
+    }
+
+    /* 전역 배열 */
+    const numbers = [];
+    let arr = [];
+    let shuffle_number = [];
+    let useGameCards = [];
+    let showCheck = true; // 보이기 버튼을 눌렀는지 확인용(처음엔 보이기상태)
+    let playing = false;
+    window.onload = function() {
+        for(let i=0; i<52; i++) {
+            numbers.push(i);
+        }
+        const dataDiv = document.getElementById("data");
+        const buttons = document.querySelectorAll('button');
+        displayCard(numbers, dataDiv, 0); // 최초렌더링
+        alert('총 4분의 시간이 주어지며, 색과 숫자가 같은 2개의 카드쌍을 찾으면 됩니다. 틀리면 -2초, 맞추면 +10초가 주어집니다!');
+        useGameCards = numbers; // 얕은 복사(number === useGameCards)
+        buttons[0].addEventListener("click", () => { // 보이기
+            arr = [];
+            playing = false;
+            displayCard(useGameCards, dataDiv);
+            showCheck = true;
+        });
+        buttons[1].addEventListener("click", () => { // 뒤집기
+            arr = [];
+            playing = true;
+            displayCard(useGameCards, dataDiv, 1);
+            showCheck = false;
+        });
+        buttons[2].addEventListener("click", () => { // 섞기
+            arr = [];
+            playing = true;
+            // 전역변수를 쓴거지만 싱글턴 비슷하게
+            // 깊은 복사(numbers !== shuffle_number)
+            // 하면서 {}내부에서 계속 실행되게해줌
+            shuffle_number = Array.prototype.slice.call(numbers);
+            shuffle_number.sort(() => Math.random()-0.5);
+            useGameCards = shuffle_number; // 얕은 복사(useGameCards === useGameCards)
+            const imgs = document.querySelectorAll('img');
+            for(let i=0, len=imgs.length; i<len; i++) {
+                imgs[i].classList.remove('answer');
+            }
+            console.log(showCheck);
+            return showCheck ? displayCard(useGameCards, dataDiv, 4) : displayCard(useGameCards, dataDiv, 3);
+        });
+        buttons[3].addEventListener("click", () => displayCard(useGameCards, dataDiv, 2)); // 감추기
+        buttons[4].addEventListener("click", () => { // 처음으로
+            const imgs = document.querySelectorAll('img');
+            for(let i=0, len=imgs.length; i<len; i++) {
+                imgs[i].classList.remove('answer');
+            }
+            arr = [];
+            useGameCards = numbers;
+            displayCard(useGameCards, dataDiv, 0);
+            leftCount();
+        });
+        buttons[5].addEventListener("click", () => {
+            time+= 100;
+        });
+        leftCount();
+    };
+</script>
+<script>
+    let time = 240; // 기준시간
+    let min = ''; //분
+    let sec = ''; //초
+    let x = setInterval(() => {
+        min = parseInt(time/60); // 몫을 계산
+        sec = time%60; // 나머지를 계산
+        document.getElementById('leftTimeDiv').innerHTML = `${min}분 ${sec}초 남았지롱`;
+        time--;
+        if (time <= 0) {
+            clearInterval(x);
+            document.getElementById('leftTimeDiv').innerHTML = `시간초과!!!!`;
+            alert('시간초과하셨습니다^^');
+        }
+    }, 1000);
+</script>
+<body>
+    <div id="buttonsDiv">
+        <button>보이기</button>
+        <button>뒤집기</button>
+        <button>섞기</button>
+        <button>감추기</button>
+        <button>처음으로</button>
+    <!--    <button>시간추가</button>-->
+    </div>
+    <div id="leftCardDiv"></div>
+    <div id="leftTimeDiv"></div>
+    <div id="data"></div>
+</body>
+</html>

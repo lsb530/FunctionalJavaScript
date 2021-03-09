@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function(){
+        const inputs = document.getElementsByTagName('input');
+        for(let i=0, len=inputs.length; i<len; i++) {
+            inputs[i].addEventListener('click', (e) => ChangeAllCheck(e, inputs));
+        }
+    });
+
+    function ChangeAllCheck(e, list) {
+        // this === e.target
+        // console.log(e);
+        // console.dir(e);
+        if(e.target === list[0]) {
+            console.log('list전체',list);
+            console.log('list하나',list[0]);
+            console.log('list하나 아이디',list[0].id);
+            for(let i=1, len=list.length; i<len; i++) {
+                list[i].checked = list[0].checked;
+            }
+            // Memo 테스트
+            // const testData = [
+            //     {'id': 1, 'name':'Kim' },
+            //     {'id': 2, 'name':'Lee' },
+            //     {'id': 3, 'name':'Park' },
+            // ]
+            // const testFilter = testData.filter(data => data.id !== 1);
+            // console.log('테스트',testFilter);
+        }
+        return setTextArea(list);
+    }
+
+    function setTextArea(inputs) {
+        const textArea = document.getElementById("ta");
+        let str = "";
+        let count = 0;
+        for(let i=1;i<inputs.length;i++) {
+            if (inputs[i].checked) {
+                count++;
+                if (count >= 2)
+                    str += ',' + inputs[i].value;
+                else
+                    str += inputs[i].value;
+            }
+            // if (count >= 2) str += inputs[i].value.join(',');
+            // else str += inputs[i].value;
+        }
+            textArea.value = str;
+    }
+</script>
+<body>
+    <input type="checkbox" value="">전체
+    <input type="checkbox" value="야구">야구
+    <input type="checkbox" value="농구">농구
+    <input type="checkbox" value="축구">축구
+    <input type="checkbox" value="배구">배구 <br>
+    <textarea name="sportsList" id="ta" cols="30" rows="10"></textarea>
+</body>
+</html>
