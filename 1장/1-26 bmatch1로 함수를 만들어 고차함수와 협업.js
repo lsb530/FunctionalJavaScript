@@ -4,7 +4,6 @@ function bmatch1(key, val) {
         return obj[key] === val;
     }
 }
-console.log(users);
 console.log(filter(users, bmatch1('age', 32)));
 // [
 //     { id: 1, name: 'ID', age: 32},
